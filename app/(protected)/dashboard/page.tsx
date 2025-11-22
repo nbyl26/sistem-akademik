@@ -1,6 +1,7 @@
 import { verifyCookie } from "@/lib/cookies";
 import { mapUserRole } from "@/lib/map";
-import { Admin, User } from "@/types/user";
+import AdminDashboard from "@/pages/AdminDashboard";
+import SiswaDashboard from "@/pages/SiswaDashboard";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -12,12 +13,22 @@ export default async function Dashboard() {
   }
   const verify = await verifyCookie(token?.value);
   if (!verify) {
-    
     return redirect("/api/auth/logout");
   }
-  return (
-    <div>
-      <h1>Hello bro</h1>
-    </div>
-  );
+
+  const user = await mapUserRole(verify);
+  if(!user){
+    return;
+  }
+
+  switch (user.role) {
+    case "admin":
+      return <AdminDashboard/>  
+    break;
+    case "siswa":
+      return <SiswaDashboard user={user}/>
+      break;
+    default:
+      break;
+  }
 }
