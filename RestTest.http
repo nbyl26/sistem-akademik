@@ -1,0 +1,16 @@
+# Asep Login Admin
+POST http://localhost:3000/api/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "uid" : "aUywD339DOPSyb42jhzcqymMypk2"
+}
+
+### 
+#Jian Login User
+POST http://localhost:3000/api/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "uid" : "nZ0FdnOzZcOWGJvnsicVuiOVHhv1"
+}
