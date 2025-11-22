@@ -2,7 +2,7 @@
 
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import { auth } from "@/firebase/config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -27,6 +27,8 @@ export default function LoginPage() {
       });
       const {message} = await res.json()
       if(res.ok){
+        await signOut(auth);
+        router.refresh();
         return router.replace("/dashboard");
       }else{
         setError(message);
