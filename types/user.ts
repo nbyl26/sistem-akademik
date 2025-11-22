@@ -3,6 +3,7 @@ export type UserRole = "admin" | "guru" | "siswa";
 export interface BaseUser {
   uid: string;
   email: string;
+  nama: string;
   role: UserRole;
 }
 
