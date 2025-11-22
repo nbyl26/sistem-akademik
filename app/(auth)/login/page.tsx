@@ -19,9 +19,18 @@ export default function LoginPage() {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    router.push("/dashboard");
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const {user} = await signInWithEmailAndPassword(auth, email, password);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({uid: user.uid})
+      });
+      const {message} = await res.json()
+      if(res.ok){
+        return router.replace("/dashboard");
+      }else{
+        setError(message);
+      }
     } catch (err) {
       if (err instanceof FirebaseError) {
         switch (err.code) {
