@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "firebase": "^12.6.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0"
