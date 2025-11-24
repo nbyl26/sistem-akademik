@@ -5,6 +5,7 @@ export interface BaseUser {
   email: string;
   nama: string;
   role: UserRole;
+  academicYearId: string;
 }
 
 export interface Admin extends BaseUser {
@@ -14,15 +15,14 @@ export interface Admin extends BaseUser {
 export interface Guru extends BaseUser {
   role: "guru";
   nip: string;
-  mataPelajaran: string;
-  kelasId: string;
+  mapelIds: string[];
+  kelasWaliIds: string[];
 }
 
 export interface Siswa extends BaseUser {
   role: "siswa";
   nis: string;
-  kelasId: string;
-  currentSemester: number;
+  kelasId: string; 
 }
 
 export type User = Admin | Guru | Siswa;
