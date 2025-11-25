@@ -99,6 +99,11 @@ export default function UserManagementPage() {
     fetchData();
   }, []);
 
+  const getClassName = (classId: string) => {
+    const foundClass = classes.find((c) => c.id === classId);
+    return foundClass ? foundClass.name : "Kelas Tidak Ditemukan";
+  };
+
   const handleCreateUser = async (
     e: React.FormEvent,
     role: "guru" | "siswa"
@@ -237,7 +242,7 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-zinc-400">
                       {user.role === "siswa"
-                        ? `Kelas: ${(user as Siswa).kelasId}`
+                        ? `Kelas: ${getClassName((user as Siswa).kelasId)}`
                         : `NIP: ${(user as Guru).nip}`}
                     </td>
                   </tr>
@@ -252,7 +257,6 @@ export default function UserManagementPage() {
             onSubmit={(e) => handleCreateUser(e, "guru")}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            {/* Input Style Baru */}
             <div className="col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
