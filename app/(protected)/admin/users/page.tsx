@@ -216,9 +216,9 @@ export default function UserManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
-                {allUsers.map((user) => (
+                {allUsers.map((user, index) => (
                   <tr
-                    key={user.uid}
+                    key={user.uid || index}
                     className="hover:bg-zinc-800/30 transition-colors"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-zinc-200">
