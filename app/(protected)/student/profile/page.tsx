@@ -12,8 +12,14 @@ export default async function StudentProfilePage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   if (!token) return redirect("/login");
-  const user: User | null = await mapUserRole(await verifyCookie(token));
-  if (!user || user.role !== "siswa") return notFound();
+  const verifiedUser = await verifyCookie(token);
+  if (!verifiedUser) {
+    return redirect("/api/auth/logout");
+  }
+  const user: User | null = await mapUserRole(verifiedUser);
+  if (!user || user.role !== "siswa") {
+    return notFound();
+  }
   const studentUser = user as Siswa;
 
   try {

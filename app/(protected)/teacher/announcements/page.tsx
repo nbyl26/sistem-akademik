@@ -13,8 +13,14 @@ export default async function TeacherAnnouncementsPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   if (!token) return redirect("/login");
-  const user: User | null = await mapUserRole(await verifyCookie(token));
-  if (!user || user.role !== "guru") return notFound();
+  const verifiedUser = await verifyCookie(token);
+  if (!verifiedUser) {
+    return redirect("/api/auth/logout");
+  }
+  const user: User | null = await mapUserRole(verifiedUser);
+  if (!user || user.role !== "guru") {
+    return notFound();
+  }
   const teacherUser = user as Guru;
 
   const announcements = await getAllDocuments<AnnouncementData>(
