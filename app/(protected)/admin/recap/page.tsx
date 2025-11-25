@@ -13,7 +13,7 @@ import {
 } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
-import { Users, Award, XCircle, CheckCircle } from "lucide-react";
+import { Users, Award, CheckCircle, XCircle } from "lucide-react";
 
 interface StudentRecap {
   uid: string;
@@ -78,8 +78,17 @@ const processGrades = (
 export default async function AdminRecapPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+
   if (!token) return redirect("/login");
-  const user: User | null = await verifyCookie(token).then(mapUserRole);
+
+  const verifiedUser = await verifyCookie(token);
+
+  if (!verifiedUser) {
+    return redirect("/api/auth/logout");
+  }
+
+  const user: User | null = await mapUserRole(verifiedUser);
+
   if (!user || user.role !== "admin") return notFound();
 
   try {
