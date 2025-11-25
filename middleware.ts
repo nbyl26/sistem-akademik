@@ -3,12 +3,13 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const session = request.cookies.get("token")?.value;
+  const pathname = request.nextUrl.pathname;
   
-  if (!session && !request.nextUrl.pathname.startsWith("/login")) {
+  if (!session && pathname !== "/login") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   
-  if (session && request.nextUrl.pathname.startsWith("/login")) {
+  if (session && pathname === "/login") {
      return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -18,6 +19,9 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/login'
+    '/login',
+    '/admin/:path*',
+    '/teacher/:path*',
+    '/student/:path*'
   ],
 };

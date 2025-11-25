@@ -1,34 +1,38 @@
 import { verifyCookie } from "@/lib/cookies";
 import { mapUserRole } from "@/lib/map";
-import AdminDashboard from "@/pages/AdminDashboard";
-import SiswaDashboard from "@/pages/SiswaDashboard";
+import AdminDashboard from "@/components/AdminDashboard";
+import SiswaDashboard from "@/components/SiswaDashboard";
+import GuruDashboard from "@/components/GuruDashboard";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
+
   if (!token) {
-    return redirect("/login");
+    return redirect("/auth/login");
   }
-  const verify = await verifyCookie(token?.value);
-  if (!verify) {
+
+  const verifiedUser = await verifyCookie(token.value);
+  if (!verifiedUser) {
     return redirect("/api/auth/logout");
   }
 
-  const user = await mapUserRole(verify);
-  if(!user){
-    return;
+  const user = await mapUserRole(verifiedUser);
+
+  if (!user) {
+    return redirect("/api/auth/logout");
   }
 
   switch (user.role) {
     case "admin":
-      return <AdminDashboard/>  
-    break;
+      return <AdminDashboard />;
+    case "guru":
+      return <GuruDashboard />; 
     case "siswa":
-      return <SiswaDashboard user={user}/>
-      break;
+      return <SiswaDashboard user={user} />;
     default:
-      break;
+      return <div>Role tidak dikenal.</div>;
   }
 }
