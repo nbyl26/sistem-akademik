@@ -24,9 +24,12 @@ export default async function ProtectedLayout({
   return (
     <div className="flex h-screen bg-zinc-950 overflow-hidden">
       <Sidebar user={user} />
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-zinc-950 text-zinc-100">
-        <div className="max-w-7xl mx-auto">{children}</div>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto bg-zinc-950 text-zinc-100 relative">
+        <div className="h-full w-full p-4 pb-24 md:p-8 md:pb-8 max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -148,7 +148,7 @@ export default function AcademicYearsPage() {
         </div>
       )}
 
-      <div className="bg-zinc-900 rounded-xl border border-zinc-800 shadow-lg overflow-hidden">
+      <div className="overflow-x-auto bg-zinc-900 rounded-xl border border-zinc-800 shadow-lg overflow-hidden">
         <table className="min-w-full divide-y divide-zinc-800">
           <thead className="bg-zinc-950/50">
             <tr>
