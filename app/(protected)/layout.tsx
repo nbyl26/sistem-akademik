@@ -13,7 +13,7 @@ export default async function ProtectedLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
-  if (!token) return redirect("/auth/login");
+  if (!token) return redirect("/login");
 
   const verifiedUser = await verifyCookie(token);
   if (!verifiedUser) return redirect("/api/auth/logout");

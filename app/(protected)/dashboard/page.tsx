@@ -11,7 +11,7 @@ export default async function Dashboard() {
   const token = cookieStore.get("token");
 
   if (!token) {
-    return redirect("/auth/login");
+    return redirect("/login");
   }
 
   const verifiedUser = await verifyCookie(token.value);
