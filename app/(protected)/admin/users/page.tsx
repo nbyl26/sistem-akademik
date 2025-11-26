@@ -243,11 +243,8 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-zinc-400">
                       {user.role === "siswa"
-                        ? `Kelas: ${(user as Siswa).kelasId}`
-                        : `NIP: ${(user as Guru).nip}`}
-                      {/* {user.role === "siswa"
                         ? `Kelas: ${(classes.filter( value => value.id === (user as Siswa).kelasId)[0]?.name)}`
-                        : `NIP: ${(user as Guru).nip}`} */}
+                        : `NIP: ${(user as Guru).nip}`}
                     </td>
                   </tr>
                 ))}
