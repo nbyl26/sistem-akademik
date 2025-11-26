@@ -78,6 +78,7 @@ export default function UserManagementPage() {
 
       setAllUsers(userData.filter((u) => u.role !== "admin"));
       setClasses(classData);
+      // console.log(classData)
       setSubjects(subjectData);
 
       if (!yearId) {
@@ -242,8 +243,11 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-zinc-400">
                       {user.role === "siswa"
-                        ? `Kelas: ${getClassName((user as Siswa).kelasId)}`
+                        ? `Kelas: ${(user as Siswa).kelasId}`
                         : `NIP: ${(user as Guru).nip}`}
+                      {/* {user.role === "siswa"
+                        ? `Kelas: ${(classes.filter( value => value.id === (user as Siswa).kelasId)[0]?.name)}`
+                        : `NIP: ${(user as Guru).nip}`} */}
                     </td>
                   </tr>
                 ))}
