@@ -12,15 +12,10 @@ import {
   ClipboardCheck,
   DollarSign,
   Megaphone,
+  PencilLine,
 } from "lucide-react";
 
 const navConfig = {
-  admin: [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Akun", href: "/admin/users", icon: Users },
-    { name: "Jadwal", href: "/admin/schedule", icon: Clock },
-    { name: "Rekap", href: "/admin/recap", icon: ClipboardCheck },
-  ],
   guru: [
     { name: "Home", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
@@ -47,6 +42,7 @@ const desktopNavConfig = {
     { name: "Data Mapel", href: "/admin/master/subjects", icon: Book },
     { name: "Jadwal Pelajaran", href: "/admin/schedule", icon: Clock },
     { name: "Rekapitulasi", href: "/admin/recap", icon: ClipboardCheck },
+    { name: "Manajemen Nilai", href: "/admin/master/grading-settings", icon: PencilLine },
   ],
 };
 

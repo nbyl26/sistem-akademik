@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, Book, Calendar, FileText } from "lucide-react";
+import { Users, Book, Calendar, FileText, PencilLine } from "lucide-react";
 
 export default function AdminDashboard() {
   const cards = [
@@ -7,6 +7,7 @@ export default function AdminDashboard() {
     { label: "Master Data", href: "/admin/master/academic-years", icon: Book },
     { label: "Jadwal Pelajaran", href: "/admin/schedule", icon: Calendar },
     { label: "Rekapitulasi", href: "/admin/recap", icon: FileText },
+    { label: "Manajemen Nilai", href: "/admin/master/grading-settings", icon: PencilLine },
   ];
 
   return (
