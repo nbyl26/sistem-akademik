@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SimakCihuy - Sistem Informasi Akademik
 
-## Getting Started
+Sistem Informasi Akademik adalah aplikasi web modern untuk manajemen data akademik sekolah. Dibangun dengan teknologi terkini untuk memberikan pengalaman pengguna yang optimal.
 
-First, run the development server:
+## 📋 Tentang Proyek
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+SimakCihuy adalah platform akademik yang menghubungkan admin, guru, dan siswa dalam satu ekosistem terintegrasi. Sistem ini memudahkan manajemen data akademik mulai dari jadwal pelajaran, nilai siswa, absensi, hingga pengumuman.
+
+## 🎯 Fitur Utama
+
+### Admin
+- **Manajemen Akun**: Kelola data pengguna (guru, siswa, admin)
+- **Master Data**: Kelola tahun ajaran, kelas, dan mata pelajaran
+- **Jadwal Pelajaran**: Buat dan kelola jadwal pembelajaran
+- **Pengaturan Penilaian**: Atur persentase komponen nilai (tugas, UTS, UAS, absensi)
+- **Rekapitulasi**: Lihat laporan akademik keseluruhan
+
+### Guru
+- **Jadwal Mengajar**: Lihat jadwal mengajar yang ditugaskan
+- **Input Nilai**: Masukkan nilai siswa untuk berbagai komponen penilaian
+- **Absensi**: Catat kehadiran siswa per kelas
+- **Pengumuman**: Buat pengumuman untuk siswa
+- **Profil**: Kelola data profil guru
+
+### Siswa
+- **Jadwal Pelajaran**: Lihat jadwal pembelajaran pribadi
+- **Kartu Hasil Studi**: Lihat nilai akhir yang dihitung otomatis berdasarkan pengaturan admin
+- **Absensi**: Lihat riwayat kehadiran
+- **Profil**: Kelola data profil siswa
+
+## 🛠 Teknologi
+
+- **Frontend**: Next.js 15+, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Firebase
+- **Database**: Firestore (NoSQL)
+- **Authentication**: Firebase Authentication (Cookie-based)
+- **UI Components**: Lucide React Icons
+
+## 📦 Struktur Proyek
+
+```
+├── app/
+│   ├── (auth)/              # Halaman login
+│   ├── (protected)/         # Halaman terproteksi (memerlukan autentikasi)
+│   │   ├── admin/          # Dashboard admin
+│   │   ├── teacher/        # Dashboard guru
+│   │   └── student/        # Dashboard siswa
+│   ├── api/                # API endpoints
+│   └── layout.tsx          # Root layout
+├── components/             # Reusable components
+├── lib/                    # Utility functions
+├── types/                  # TypeScript interfaces
+└── firebase/               # Firebase configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prasyarat
+- Node.js 18+ dan npm/yarn/pnpm
+- Firebase project setup
+- Environment variables configured
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Instalasi
 
-## Learn More
+1. Clone repository:
+```bash
+git clone https://github.com/nbyl26/sistem-akademik.git
+cd sistem-akademik
+```
 
-To learn more about Next.js, take a look at the following resources:
+2. Install dependencies:
+```bash
+npm install
+# atau
+yarn install
+# atau
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Setup environment variables:
+Buat file `.env.local` di root project:
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Jalankan development server:
+```bash
+npm run dev
+# atau
+yarn dev
+# atau
+pnpm dev
+```
 
-## Deploy on Vercel
+5. Buka [http://localhost:3000](http://localhost:3000) di browser
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Autentikasi
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sistem menggunakan Firebase Authentication dengan cookie untuk sesi pengguna. Ada 3 role:
+- **Admin**: Akses penuh ke semua fitur manajemen
+- **Guru**: Akses input nilai dan absensi
+- **Siswa**: Akses view nilai dan jadwal
+
+## 📊 Fitur Perhitungan Nilai
+
+Sistem ini menghitung nilai akhir siswa berdasarkan:
+- **Persentase Tugas Harian**: Rata-rata nilai tugas harian
+- **Persentase UTS**: Nilai ujian tengah semester
+- **Persentase UAS**: Nilai ujian akhir semester
+- **Persentase Absensi** (opsional): Persentase kehadiran siswa
+
+Admin dapat mengatur persentase setiap komponen, dan siswa akan melihat nilai akhir yang dihitung otomatis.
+
+**Formula**: 
+```
+Nilai Akhir = (Avg Tugas × Tugas%) + (UTS × UTS%) + (UAS × UAS%) + (Absensi × Absensi%)
+```
+
+## 📝 Lisensi
+
+Proyek ini adalah bagian dari tugas akademik Semester 5 - Sistem Informasi.
+
+## 👨‍💻 Developer
+
+Dikembangkan oleh: nbyl26
+                   AlifJian
+
+---
+
+Untuk informasi lebih lanjut, kunjungi [dokumentasi Next.js](https://nextjs.org/docs)
