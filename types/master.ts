@@ -70,3 +70,14 @@ export interface AnnouncementData {
   date: string;
   targetRole: "all" | "siswa";
 }
+
+export interface GradeSettings {
+  id: string;
+  academicYearId: string;
+  tugasPercentage: number;
+  utsPercentage: number;
+  uasPercentage: number;
+  lainnyaPercentage?: number;
+  absencePercentage?: number;
+  updatedAt: string;
+}

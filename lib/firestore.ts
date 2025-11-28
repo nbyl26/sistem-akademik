@@ -7,6 +7,7 @@ import {
   where,
   doc,
   updateDoc,
+  deleteDoc,
   WhereFilterOp,
   Query,
   DocumentData,
@@ -77,4 +78,12 @@ export async function getActiveAcademicYear(): Promise<AcademicYear | null> {
     id: docData.id,
     ...docData.data(),
   } as AcademicYear;
+}
+
+export async function deleteDocument(
+  collectionName: string,
+  id: string
+): Promise<void> {
+  const docRef = doc(db, collectionName, id);
+  await deleteDoc(docRef);
 }

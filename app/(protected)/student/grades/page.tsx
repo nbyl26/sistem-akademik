@@ -8,6 +8,8 @@ import {
   SubjectData,
   ClassData,
   AssessmentType,
+  GradeSettings,
+  AttendanceRecord,
 } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
@@ -24,9 +26,18 @@ interface SubjectScore {
 const calculateReportCard = (
   gradeRecords: GradeRecord[],
   studentId: string,
-  subjects: SubjectData[]
+  subjects: SubjectData[],
+  gradeSettings: GradeSettings | null,
+  attendanceRecords: AttendanceRecord[]
 ): Record<string, SubjectScore> => {
   const report: Record<string, SubjectScore> = {};
+  
+  // Use settings from admin or default values
+  const tugasWeight = gradeSettings?.tugasPercentage ?? 50;
+  const utsWeight = gradeSettings?.utsPercentage ?? 25;
+  const uasWeight = gradeSettings?.uasPercentage ?? 25;
+  const absenceWeight = gradeSettings?.absencePercentage ?? 0;
+  
   gradeRecords.forEach((record) => {
     const subjectId = record.subjectId;
     const subjectName =
@@ -66,8 +77,39 @@ const calculateReportCard = (
         ? entry.details["UAS"].reduce((a, b) => a + b) /
           entry.details["UAS"].length
         : 0;
+    
+    // Calculate absence score for this subject
+    let absenceScore = 100; // Default perfect attendance
+    if (absenceWeight > 0) {
+      const subjectAttendance = attendanceRecords.filter(
+        (a) => a.subjectId === subjectId
+      );
+      if (subjectAttendance.length > 0) {
+        let totalRecords = 0;
+        let presentDays = 0;
+        subjectAttendance.forEach((record) => {
+          const studentRecord = record.records.find((r) => r.studentId === studentId);
+          if (studentRecord) {
+            totalRecords++;
+            if (studentRecord.status === "Hadir") {
+              presentDays++;
+            }
+          }
+        });
+        if (totalRecords > 0) {
+          absenceScore = (presentDays / totalRecords) * 100;
+        }
+      }
+    }
+    
+    // Calculate using admin settings percentages
     entry.finalGrade = parseFloat(
-      (avgTugas * 0.5 + avgUTS * 0.25 + avgUAS * 0.25).toFixed(2)
+      (
+        avgTugas * (tugasWeight / 100) +
+        avgUTS * (utsWeight / 100) +
+        avgUAS * (uasWeight / 100) +
+        absenceScore * (absenceWeight / 100)
+      ).toFixed(2)
     );
   });
   return report;
@@ -90,15 +132,23 @@ export default async function StudentGradesPage() {
         <div className="p-8 text-center text-red-500">Sistem Belum Aktif.</div>
       );
 
-    const [gradeRecords, subjects, classes] = await Promise.all([
+    const [gradeRecords, subjects, classes, gradeSettingsData, attendanceRecords] = await Promise.all([
       getAllDocuments<GradeRecord>("grades", [
         ["classId", "==", studentUser.kelasId],
         ["academicYearId", "==", activeYear.id!],
       ]),
       getAllDocuments<SubjectData>("subjects"),
       getAllDocuments<ClassData>("classes"),
+      getAllDocuments<GradeSettings>("grade_settings", [
+        ["academicYearId", "==", activeYear.id!],
+      ]),
+      getAllDocuments<AttendanceRecord>("attendance", [
+        ["classId", "==", studentUser.kelasId],
+        ["academicYearId", "==", activeYear.id!],
+      ]),
     ]);
 
+    const gradeSettings = gradeSettingsData.length > 0 ? gradeSettingsData[0] : null;
     const studentClassName =
       classes.find((c) => c.id === studentUser.kelasId)?.name || "N/A";
     const studentGradeRecords = gradeRecords.filter(
@@ -107,7 +157,9 @@ export default async function StudentGradesPage() {
     const reportCard = calculateReportCard(
       studentGradeRecords,
       studentUser.uid,
-      subjects
+      subjects,
+      gradeSettings,
+      attendanceRecords
     );
     const subjectsInReport = Object.values(reportCard);
 
@@ -144,7 +196,7 @@ export default async function StudentGradesPage() {
                   <th className="px-6 py-4 text-center text-xs font-medium text-zinc-400 uppercase">
                     UAS
                   </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-orange-500 uppercase font-bold">
+                  <th className="px-6 py-4 text-center text-xs font-bold text-orange-500 uppercase">
                     Nilai Akhir
                   </th>
                 </tr>
