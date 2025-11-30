@@ -39,6 +39,7 @@ export async function getAllDocuments<T>(
     (doc) =>
       ({
         id: doc.id,
+        uid: doc.id,
         ...(doc.data() as object), 
       } as T)
   );
