@@ -61,11 +61,22 @@ export interface GradeRecord {
   scores: { [studentId: string]: number | null };
 }
 
+export interface GradeSettings {
+  id: string;
+  academicYearId: string;
+  tugasPercentage: number;
+  utsPercentage: number;
+  uasPercentage: number;
+  lainnyaPercentage?: number;
+  absencePercentage?: number;
+  updatedAt: string;
+}
+
 export interface AnnouncementData {
   id: string;
   title: string;
   content: string;
-  authorId: string; 
+  authorId: string;
   authorName: string;
   date: string;
   targetRole: "all" | "siswa";
