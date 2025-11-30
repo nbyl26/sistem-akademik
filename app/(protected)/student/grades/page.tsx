@@ -182,7 +182,7 @@ export default async function StudentGradesPage() {
           </div>
 
           <Link
-            href="/student/grades/print"
+            href="/cetak/rapor" 
             target="_blank"
             className="bg-zinc-100 text-zinc-900 px-5 py-2.5 rounded-xl font-bold flex items-center justify-center hover:bg-white transition-all shadow-lg shadow-white/5 active:scale-95 shrink-0"
           >
