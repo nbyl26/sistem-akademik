@@ -224,6 +224,8 @@ export default function UserManagementPage() {
       if (isEditing) {
         const { password, ...updateData } = firestoreData;
         await updateDocument(COLLECTION_NAME, uid, updateData);
+        await updateDocument("classes", updateData.kelasWaliIds[0], {waliKelasId: uid});
+        await updateDocument("classes", ((allUsers.find(u => u.uid === uid)) as Guru).kelasWaliIds[0], {waliKelasId: null});
         alert("Data berhasil diperbarui!");
       } else {
         await setDoc(doc(db, "users", uid), firestoreData);
