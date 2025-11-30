@@ -23,6 +23,7 @@ export default async function TeacherAttendancePage() {
     return notFound();
   }
   const teacherUser = user as Guru;
+  const day = new Date().toLocaleDateString("id-ID", { weekday: "long" });
 
   try {
     const activeYear = await getActiveAcademicYear();
@@ -34,9 +35,11 @@ export default async function TeacherAttendancePage() {
       );
     }
 
+
     const [schedules, classes, subjects, allStudents] = await Promise.all([
       getAllDocuments<ScheduleData>("schedules", [
         ["teacherId", "==", teacherUser.uid],
+        ["day", "==", day],
         ["academicYearId", "==", activeYear.id!],
       ]),
       getAllDocuments<ClassData>("classes"),
