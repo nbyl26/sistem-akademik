@@ -37,6 +37,7 @@ export default function AttendanceForm({
   allStudents,
   activeYearId,
 }: AttendanceProps) {
+  const today = new Date().toLocaleDateString("id-ID", { timeZone: 'Asia/Jakarta' });
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
     null
   );
@@ -73,7 +74,7 @@ export default function AttendanceForm({
     setLoading(true);
     const attendence = await getAllDocuments<AttendanceRecord>("attendance", [
       ["teacherId", "==", teacherId],
-      ["date", "==", new Date().toLocaleDateString("id-ID")], 
+      ["date", "==", today], 
     ])
 
 
@@ -107,7 +108,7 @@ export default function AttendanceForm({
         classId: selectedSchedule.classId,
         subjectId: selectedSchedule.subjectId,
         teacherId: teacherId,
-        date: new Date().toLocaleDateString("id-ID"),
+        date: today,
         records: records,
       };
 

@@ -23,7 +23,7 @@ export default async function TeacherAttendancePage() {
     return notFound();
   }
   const teacherUser = user as Guru;
-  const day = new Date().toLocaleDateString("id-ID", { weekday: "long" });
+  const day = new Date().toLocaleDateString("id-ID", { weekday: "long" , timeZone: 'Asia/Jakarta'});
 
   try {
     const activeYear = await getActiveAcademicYear();
