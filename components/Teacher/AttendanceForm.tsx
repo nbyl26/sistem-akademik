@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { addDocument } from "@/lib/firestore";
+import { addDocument, getAllDocuments } from "@/lib/firestore";
 import {
   ScheduleData,
   ClassData,
@@ -74,6 +74,16 @@ export default function AttendanceForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const attendence = await getAllDocuments<AttendanceRecord>("attendance", [
+      ["teacherId", "==", teacherId],
+      ["date", "==", attendanceDate], 
+    ])
+
+    if(attendence.length > 0){
+      alert("Absensi untuk jadwal dan tanggal ini sudah ada.");
+      setLoading(false);
+      return;
+    }
 
     if (
       !selectedSchedule ||
