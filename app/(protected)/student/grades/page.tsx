@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { verifyCookie } from "@/lib/cookies";
 import { mapUserRole } from "@/lib/map";
 import { Siswa, User } from "@/types/user";
@@ -12,7 +13,7 @@ import {
 } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
-import { Award, BookOpen, AlertCircle } from "lucide-react";
+import { Award, BookOpen, AlertCircle, Printer } from "lucide-react";
 
 interface SubjectScore {
   subjectName: string;
@@ -160,28 +161,43 @@ export default async function StudentGradesPage() {
 
     return (
       <div className="p-2">
-        <h1 className="text-3xl font-bold mb-2 text-zinc-100">
-          Kartu Hasil Studi
-        </h1>
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between text-sm text-zinc-400">
-          <p>
-            Siswa:{" "}
-            <span className="font-bold text-orange-500">
-              {studentUser.nama}
-            </span>{" "}
-            | Kelas: {studentClassName}
-          </p>
-          <p className="mt-1 md:mt-0">
-            Tahun Ajaran:{" "}
-            <span className="text-zinc-200">{activeYear.name}</span>
-          </p>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 text-zinc-100">
+              Kartu Hasil Studi
+            </h1>
+            <div className="text-sm text-zinc-400 space-y-1">
+              <p>
+                Siswa:{" "}
+                <span className="font-bold text-orange-500">
+                  {studentUser.nama}
+                </span>{" "}
+                | Kelas: {studentClassName}
+              </p>
+              <p>
+                Tahun Ajaran:{" "}
+                <span className="text-zinc-200">{activeYear.name}</span>
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/student/grades/print"
+            target="_blank"
+            className="bg-zinc-100 text-zinc-900 px-5 py-2.5 rounded-xl font-bold flex items-center justify-center hover:bg-white transition-all shadow-lg shadow-white/5 active:scale-95 shrink-0"
+          >
+            <Printer className="w-5 h-5 mr-2" />
+            Cetak / PDF
+          </Link>
         </div>
 
         {!currentGradeSettings && (
-          <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg flex items-center text-yellow-500 text-sm">
-            <AlertCircle className="w-5 h-5 mr-3" />
-            Bobot nilai belum diatur oleh Admin. Menggunakan perhitungan standar
-            (50/25/25).
+          <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg flex items-center text-yellow-500 text-sm animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+            <span>
+              Bobot nilai belum diatur oleh Admin. Menggunakan perhitungan
+              standar (50/25/25).
+            </span>
           </div>
         )}
 
