@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { addDocument, getAllDocuments } from "@/lib/firestore";
+import { addDocument, getAllDocuments, updateDocument } from "@/lib/firestore";
 import {
   ScheduleData,
   ClassData,
@@ -40,9 +40,6 @@ export default function AttendanceForm({
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
     null
   );
-  const [attendanceDate, setAttendanceDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
-  );
   const [currentClassStudents, setCurrentClassStudents] = useState<Siswa[]>([]);
   const [attendanceData, setAttendanceData] = useState<
     Record<string, AttendanceStatus>
@@ -76,18 +73,12 @@ export default function AttendanceForm({
     setLoading(true);
     const attendence = await getAllDocuments<AttendanceRecord>("attendance", [
       ["teacherId", "==", teacherId],
-      ["date", "==", attendanceDate], 
+      ["date", "==", new Date().toLocaleDateString("id-ID")], 
     ])
 
-    if(attendence.length > 0){
-      alert("Absensi untuk jadwal dan tanggal ini sudah ada.");
-      setLoading(false);
-      return;
-    }
 
     if (
       !selectedSchedule ||
-      !attendanceDate ||
       currentClassStudents.length === 0
     ) {
       alert("Harap pilih jadwal dan pastikan ada siswa.");
@@ -116,13 +107,21 @@ export default function AttendanceForm({
         classId: selectedSchedule.classId,
         subjectId: selectedSchedule.subjectId,
         teacherId: teacherId,
-        date: attendanceDate,
+        date: new Date().toLocaleDateString("id-ID"),
         records: records,
       };
 
-      await addDocument("attendance", attendanceRecord);
-      alert("Absensi berhasil disimpan!");
-      setLoading(false);
+
+      if(attendence.length > 0){
+        await updateDocument("attendance", attendence[0].id, attendanceRecord);
+        alert("Absensi berhasil diperbarui!");
+        setLoading(false);
+        return;
+      }else{
+        await addDocument("attendance", attendanceRecord);
+        alert("Absensi berhasil disimpan!");
+        setLoading(false);
+      }
     } catch (error: any) {
       console.error("Error saving attendance:", error);
       alert(`Gagal menyimpan: ${error.message || "Terjadi kesalahan sistem"}`);
@@ -143,18 +142,6 @@ export default function AttendanceForm({
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border border-zinc-800 rounded-xl bg-zinc-950/50">
-          <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1">
-              Tanggal
-            </label>
-            <input
-              type="date"
-              value={attendanceDate}
-              onChange={(e) => setAttendanceDate(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-100 p-2 rounded-lg focus:border-orange-500 outline-none"
-              required
-            />
-          </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-zinc-400 mb-1">
               Jadwal Mengajar
