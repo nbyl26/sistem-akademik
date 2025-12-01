@@ -203,7 +203,7 @@ export default function AttendanceForm({
                     {getSubjectName(schedule.subjectId)})
                   </option>
                 ))
-              }
+              )}
             </select>
           </div>
         </div>
