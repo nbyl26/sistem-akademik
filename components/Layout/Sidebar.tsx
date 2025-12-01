@@ -13,15 +13,18 @@ import {
   DollarSign,
   Megaphone,
   PencilLine,
+  FileText, 
 } from "lucide-react";
 
 const navConfig = {
   guru: [
-    { name: "Home", href: "/dashboard", icon: Home },
+    { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
+    { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
     { name: "Nilai", href: "/teacher/grades", icon: DollarSign },
-    { name: "Absen", href: "/teacher/attendance", icon: ClipboardCheck },
-    { name: "Info", href: "/teacher/announcements", icon: Megaphone },
+    { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText }, // Tambahkan ini
+    { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
+    { name: "Profil", href: "/teacher/profile", icon: Users },
   ],
   siswa: [
     { name: "Home", href: "/dashboard", icon: Home },
@@ -42,7 +45,20 @@ const desktopNavConfig = {
     { name: "Data Mapel", href: "/admin/master/subjects", icon: Book },
     { name: "Jadwal Pelajaran", href: "/admin/schedule", icon: Clock },
     { name: "Rekapitulasi", href: "/admin/recap", icon: ClipboardCheck },
-    { name: "Manajemen Nilai", href: "/admin/master/grading-settings", icon: PencilLine },
+    {
+      name: "Manajemen Nilai",
+      href: "/admin/master/grading-settings",
+      icon: PencilLine,
+    },
+  ],
+  guru: [
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
+    { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
+    { name: "Nilai", href: "/teacher/grades", icon: DollarSign },
+    { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText },
+    { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
+    { name: "Profil", href: "/teacher/profile", icon: Users },
   ],
 };
 

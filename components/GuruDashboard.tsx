@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ClipboardCheck, DollarSign, Calendar, Megaphone } from "lucide-react";
+import {
+  ClipboardCheck,
+  DollarSign,
+  Calendar,
+  Megaphone,
+  FileText,
+} from "lucide-react";
 
 export default function GuruDashboard() {
   return (
@@ -63,6 +69,18 @@ export default function GuruDashboard() {
               Pengumuman
             </h3>
             <p className="text-sm text-zinc-500 mt-2">Info untuk siswa</p>
+          </div>
+        </Link>
+
+        <Link href="/teacher/recap" className="group block">
+          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
+            <div className="bg-indigo-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-indigo-500 mb-4">
+              <FileText size={28} />
+            </div>
+            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-indigo-400">
+              Rekap Absensi
+            </h3>
+            <p className="text-sm text-zinc-500 mt-2">Cetak laporan absensi</p>
           </div>
         </Link>
       </div>

@@ -11,12 +11,9 @@ import GradeInputForm from "@/components/Teacher/GradeInputForm";
 export default async function TeacherGradesPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-
   if (!token) return redirect("/login");
-
   const verifiedUser = await verifyCookie(token);
   if (!verifiedUser) return redirect("/api/auth/logout");
-
   const user: User | null = await mapUserRole(verifiedUser);
 
   if (!user || user.role !== "guru") {
