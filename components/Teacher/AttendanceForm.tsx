@@ -37,7 +37,9 @@ export default function AttendanceForm({
   allStudents,
   activeYearId,
 }: AttendanceProps) {
-  const today = new Date().toLocaleDateString("id-ID", { timeZone: 'Asia/Jakarta' });
+  const today = new Date().toLocaleDateString("id-ID", {
+    timeZone: "Asia/Jakarta",
+  });
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
     null
   );
@@ -45,6 +47,7 @@ export default function AttendanceForm({
   const [attendanceData, setAttendanceData] = useState<
     Record<string, AttendanceStatus>
   >({});
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   const safeSchedules = Array.isArray(schedules) ? schedules : [];
@@ -52,14 +55,48 @@ export default function AttendanceForm({
     (s) => s.id === selectedScheduleId
   );
 
+  // Fetch attendance records on mount
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        const records = await getAllDocuments<AttendanceRecord>("attendance", [
+          ["teacherId", "==", teacherId],
+          ["date", "==", today],
+        ]);
+        setAttendance(records);
+      } catch (error) {
+        console.error("Error fetching attendance:", error);
+      }
+    };
+    fetchAttendance();
+  }, [selectedScheduleId]);
+
+  // Fetch attendance and set form data when selectedSchedule changes
   useEffect(() => {
     if (selectedSchedule) {
       const studentsInClass = allStudents.filter(
         (s) => s.kelasId === selectedSchedule.classId
       );
       setCurrentClassStudents(studentsInClass);
+
+      // Find attendance record for this schedule
+      const existingAttendance = attendance.find(
+        (record) =>
+          record.classId === selectedSchedule.classId &&
+          record.subjectId === selectedSchedule.subjectId &&
+          record.date === today
+      );
+
+      // Initialize attendance data with existing data or default "Hadir"
       const initialAttendance = studentsInClass.reduce((acc, student) => {
-        acc[student.uid] = "Hadir";
+        if (existingAttendance) {
+          const studentRecord = existingAttendance.records.find(
+            (rec) => rec.studentId === student.uid
+          );
+          acc[student.uid] = studentRecord?.status || "Hadir";
+        } else {
+          acc[student.uid] = "Hadir";
+        }
         return acc;
       }, {} as Record<string, AttendanceStatus>);
       setAttendanceData(initialAttendance);
@@ -67,21 +104,13 @@ export default function AttendanceForm({
       setCurrentClassStudents([]);
       setAttendanceData({});
     }
-  }, [selectedSchedule, allStudents]);
+  }, [selectedSchedule, allStudents, attendance, today]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const attendence = await getAllDocuments<AttendanceRecord>("attendance", [
-      ["teacherId", "==", teacherId],
-      ["date", "==", today], 
-    ])
 
-
-    if (
-      !selectedSchedule ||
-      currentClassStudents.length === 0
-    ) {
+    if (!selectedSchedule || currentClassStudents.length === 0) {
       alert("Harap pilih jadwal dan pastikan ada siswa.");
       setLoading(false);
       return;
@@ -112,13 +141,21 @@ export default function AttendanceForm({
         records: records,
       };
 
+      // Find existing attendance record for this class and subject
+      const existingRecord = attendance.find(
+        (record) =>
+          record.subjectId === selectedSchedule.subjectId &&
+          record.classId === selectedSchedule.classId &&
+          record.date === today
+      );
+      console.log("Existing Record:", existingRecord);
 
-      if(attendence.length > 0){
-        await updateDocument("attendance", attendence[0].id, attendanceRecord);
+      if (existingRecord) {
+        await updateDocument("attendance", existingRecord.id, attendanceRecord);
         alert("Absensi berhasil diperbarui!");
         setLoading(false);
         return;
-      }else{
+      } else {
         await addDocument("attendance", attendanceRecord);
         alert("Absensi berhasil disimpan!");
         setLoading(false);
@@ -166,7 +203,7 @@ export default function AttendanceForm({
                     {getSubjectName(schedule.subjectId)})
                   </option>
                 ))
-              )}
+              }
             </select>
           </div>
         </div>
