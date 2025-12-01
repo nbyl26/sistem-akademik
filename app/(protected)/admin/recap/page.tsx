@@ -9,7 +9,7 @@ import {
   AcademicYear,
   GradeRecord,
   SubjectData,
-  GradeSettings, // Pastikan interface ini ada di types/master
+  GradeSettings, 
 } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
@@ -36,20 +36,17 @@ interface StudentRecap {
 
 const INITIAL_STATUS = { Hadir: 0, Sakit: 0, Izin: 0, Alpha: 0 };
 
-// Helper: Menghitung nilai akhir berdasarkan bobot
 const calculateFinalScore = (
   scores: { type: string; value: number }[],
   settings: GradeSettings | null
 ): number => {
   if (!settings) {
-    // Default fallback jika setting belum dibuat: Rata-rata sederhana
     const total = scores.reduce((a, b) => a + b.value, 0);
     return scores.length > 0 ? total / scores.length : 0;
   }
 
   let totalScore = 0;
 
-  // 1. Hitung Rata-rata per Kategori
   const tugasScores = scores
     .filter((s) => s.type === "Tugas Harian")
     .map((s) => s.value);
@@ -76,7 +73,6 @@ const calculateFinalScore = (
       ? lainScores.reduce((a, b) => a + b, 0) / lainScores.length
       : 0;
 
-  // 2. Kalikan dengan Bobot (Persentase / 100)
   totalScore += avgTugas * (settings.tugasPercentage / 100);
   totalScore += avgUTS * (settings.utsPercentage / 100);
   totalScore += avgUAS * (settings.uasPercentage / 100);
@@ -93,13 +89,11 @@ const processGrades = (
   string,
   Record<string, { finalGrade: number; subjectName: string }>
 > => {
-  // Structure: StudentID -> SubjectID -> Array of {type, value}
   const rawScores: Record<
     string,
     Record<string, { type: string; value: number }[]>
   > = {};
 
-  // Kumpulkan semua nilai mentah
   gradeRecords.forEach((record) => {
     const subjectId = record.subjectId;
     const type = record.assessmentType;
@@ -125,7 +119,6 @@ const processGrades = (
     {} as Record<string, string>
   );
 
-  // Hitung Nilai Akhir
   Object.keys(rawScores).forEach((studentId) => {
     finalReport[studentId] = {};
     Object.keys(rawScores[studentId]).forEach((subjectId) => {
@@ -164,7 +157,6 @@ export default async function AdminRecapPage() {
       );
     }
 
-    // Fetch Data Parallel (Termasuk Grade Settings)
     const [
       allStudents,
       classes,
@@ -195,14 +187,12 @@ export default async function AdminRecapPage() {
       {} as Record<string, string>
     );
 
-    // Proses Nilai dengan Setting
     const finalGradesByStudent = processGrades(
       allGradeRecords,
       subjects,
       currentGradeSettings
     );
 
-    // Gabungkan Data
     const recapMap = allStudents.reduce((map, student) => {
       map[student.uid] = {
         uid: student.uid,
@@ -254,7 +244,6 @@ export default async function AdminRecapPage() {
           )}
         </div>
 
-        {/* --- Tab Absensi --- */}
         <div>
           <h2 className="text-xl font-bold mb-4 flex items-center text-zinc-300">
             <Users className="w-5 h-5 mr-2 text-orange-500" /> 1. Rekap Absensi
@@ -317,7 +306,6 @@ export default async function AdminRecapPage() {
           </div>
         </div>
 
-        {/* --- Tab Nilai --- */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold flex items-center text-zinc-300">

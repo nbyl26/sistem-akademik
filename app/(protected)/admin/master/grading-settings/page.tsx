@@ -79,12 +79,10 @@ export default function GradingSettingsPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Update input value (allow empty string for editing)
     setInputValues((prev) => ({
       ...prev,
       [name]: value,
     }));
-    // Update form data with parsed value or 0 if empty
     const parsedValue = value === "" ? 0 : parseFloat(value);
     const finalValue = isNaN(parsedValue) ? 0 : parsedValue;
     setFormData((prev) => ({
@@ -94,7 +92,6 @@ export default function GradingSettingsPage() {
   };
 
   const validatePercentages = () => {
-    // Check required fields are not 0
     if (formData.tugasPercentage <= 0) {
       setError("Tugas Harian harus lebih dari 0%");
       return false;
