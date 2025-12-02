@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { addDocument, getAllDocuments, updateDocument } from "@/lib/firestore";
+import { addDocument, getAllDocuments, updateDocument, deleteDocument } from "@/lib/firestore";
 import { SubjectData } from "@/types/master";
-import { PlusCircle, Save, BookOpen, Pencil, X } from "lucide-react";
+import { PlusCircle, Save, BookOpen, Pencil, X, Trash2 } from "lucide-react";
 
 export default function SubjectsPage() {
   const [subjects, setSubjects] = useState<SubjectData[]>([]);
@@ -59,8 +59,34 @@ export default function SubjectsPage() {
     setFormData({ name: "", code: "" });
   };
 
+  // Validate if code already exists
+  const checkDuplicateCode = (): string | null => {
+    const { code } = formData;
+    const codeExists = subjects.some((subject) => {
+      // If editing, exclude the current subject from check
+      if (isEditing && editId === subject.id) {
+        return false;
+      }
+      return subject.code.toLowerCase() === code.toLowerCase();
+    });
+
+    if (codeExists) {
+      return `Kode mapel "${code}" sudah digunakan. Gunakan kode yang berbeda.`;
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate duplicate code
+    const duplicateError = checkDuplicateCode();
+    if (duplicateError) {
+      console.log("Duplicate code found:", duplicateError);
+      setError(duplicateError);
+      return;
+    }
+
     try {
       if (isEditing && editId) {
         await updateDocument(COLLECTION_NAME, editId, formData);
@@ -74,6 +100,18 @@ export default function SubjectsPage() {
     }
   };
 
+  const handleDelete = async (id: string, name: string) => {
+    if (confirm(`Hapus mata pelajaran "${name}"? Tindakan ini tidak dapat dibatalkan.`)) {
+      try {
+        await deleteDocument(COLLECTION_NAME, id);
+        setError(null);
+        await fetchData();
+      } catch (err) {
+        setError("Gagal menghapus data.");
+      }
+    }
+  };
+
   if (isLoading) return <div className="p-4 text-zinc-400">Memuat data...</div>;
 
   return (
@@ -81,6 +119,20 @@ export default function SubjectsPage() {
       <h1 className="text-3xl font-bold mb-6 text-zinc-100">
         Manajemen Mata Pelajaran
       </h1>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="text-red-400">
+            <p className="font-medium">{error}</p>
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-300 transition-colors ml-4"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       <button
         onClick={() => (isFormOpen ? handleClose() : setIsFormOpen(true))}
@@ -187,9 +239,15 @@ export default function SubjectsPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleEdit(subject)}
-                    className="text-orange-400 hover:text-orange-300 transition-colors flex items-center float-right px-3 py-1 hover:bg-orange-900/20 rounded"
+                    className="text-orange-400 hover:text-orange-300 transition-colors inline-flex items-center px-3 py-1 hover:bg-orange-900/20 rounded"
                   >
                     <Pencil className="w-3 h-3 mr-2" /> Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(subject.id, subject.name)}
+                    className="text-red-400 hover:text-red-300 transition-colors inline-flex items-center px-3 py-1 hover:bg-red-900/20 rounded ml-2"
+                  >
+                    <Trash2 className="w-3 h-3 mr-2" /> Hapus
                   </button>
                 </td>
               </tr>
