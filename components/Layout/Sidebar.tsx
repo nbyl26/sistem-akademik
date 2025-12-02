@@ -61,7 +61,7 @@ const desktopNavConfig = {
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
     { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
-    { name: "Nilai", href: "/teacher/grades", icon: DollarSign },
+    { name: "Nilai", href: "/teacher/grades", icon: PencilLine },
     { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText },
     { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
@@ -69,7 +69,7 @@ const desktopNavConfig = {
   siswa: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/student/schedule", icon: Clock },
-    { name: "Nilai", href: "/student/grades", icon: DollarSign },
+    { name: "Nilai", href: "/student/grades", icon: PencilLine },
     { name: "Absen", href: "/student/attendance", icon: ClipboardCheck },
     { name: "Pengumuman", href: "/student/announcements", icon: Megaphone },
     { name: "Profil", href: "/student/profile", icon: Users },
