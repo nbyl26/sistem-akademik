@@ -13,25 +13,32 @@ import {
 } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
-import {
-  Users,
-  Award,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-} from "lucide-react";
+import RecapContent from "@/components/RecapContent";
 
 interface StudentRecap {
   uid: string;
   name: string;
   nis: string;
   className: string;
+  classId: string;
   total: number;
   Hadir: number;
   Sakit: number;
   Izin: number;
   Alpha: number;
   grades: Record<string, { subjectName: string; finalGrade: number }>;
+}
+
+interface ClassRecap {
+  classId: string;
+  className: string;
+  students: StudentRecap[];
+}
+
+export interface AcademicYearRecap {
+  yearId: string;
+  yearName: string;
+  classes: ClassRecap[];
 }
 
 const INITIAL_STATUS = { Hadir: 0, Sakit: 0, Izin: 0, Alpha: 0 };
@@ -199,6 +206,7 @@ export default async function AdminRecapPage() {
         name: student.nama,
         nis: student.nis,
         className: classMap[student.kelasId] || "Kelas Unknown",
+        classId: student.kelasId,
         total: 0,
         ...INITIAL_STATUS,
         grades: finalGradesByStudent[student.uid] || {},
@@ -217,169 +225,45 @@ export default async function AdminRecapPage() {
       });
     });
 
+    // Organize data hierarchically: Academic Year → ClassId → Students
+    const classesGrouped = new Map<string, StudentRecap[]>();
+    Object.values(recapMap).forEach((student) => {
+      if (!classesGrouped.has(student.classId)) {
+        classesGrouped.set(student.classId, []);
+      }
+      classesGrouped.get(student.classId)!.push(student);
+    });
+
+    // Sort students within each class
+    classesGrouped.forEach((students) => {
+      students.sort((a, b) => a.name.localeCompare(b.name));
+    });
+
+    // Build hierarchical structure
+    const academicYearRecap: AcademicYearRecap = {
+      yearId: activeYear.id!,
+      yearName: activeYear.name,
+      classes: Array.from(classesGrouped.entries())
+        .map(([classId, students]) => ({
+          classId,
+          className: classMap[classId] || "Kelas Unknown",
+          students,
+        }))
+        .sort((a, b) => a.className.localeCompare(b.className)),
+    };
+
     const finalRecapList = Object.values(recapMap).sort(
       (a, b) =>
         a.className.localeCompare(b.className) || a.name.localeCompare(b.name)
     );
 
     return (
-      <div className="p-2 space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-100">
-            Rekapitulasi Global
-          </h1>
-          <p className="text-zinc-400 mt-1">
-            Tahun Ajaran:{" "}
-            <span className="text-orange-500 font-semibold">
-              {activeYear.name}
-            </span>
-          </p>
-
-          {!currentGradeSettings && (
-            <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg flex items-center text-yellow-500 text-sm">
-              <AlertTriangle className="w-5 h-5 mr-3" />
-              Warning: Pengaturan Persentase Nilai belum dibuat untuk tahun
-              ajaran ini. Nilai dihitung menggunakan rata-rata standar.
-            </div>
-          )}
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold mb-4 flex items-center text-zinc-300">
-            <Users className="w-5 h-5 mr-2 text-orange-500" /> 1. Rekap Absensi
-          </h2>
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 shadow-lg overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-800">
-              <thead className="bg-zinc-950/50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase sticky left-0 bg-zinc-950 z-10">
-                    Siswa / Kelas
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-zinc-400 uppercase">
-                    Total
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-green-500 uppercase">
-                    Hadir
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-yellow-500 uppercase">
-                    Sakit
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-blue-500 uppercase">
-                    Izin
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-red-500 uppercase font-extrabold">
-                    Alpha
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {finalRecapList.map((rec) => (
-                  <tr
-                    key={rec.uid}
-                    className="hover:bg-zinc-800/30 transition-colors"
-                  >
-                    <td className="px-6 py-4 text-sm font-medium text-zinc-200 sticky left-0 bg-zinc-900 z-10 border-r border-zinc-800">
-                      {rec.name} <br />{" "}
-                      <span className="text-xs text-zinc-500">
-                        {rec.className}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-zinc-400 font-semibold">
-                      {rec.total}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-green-500">
-                      {rec.Hadir}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-yellow-500">
-                      {rec.Sakit}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-blue-500">
-                      {rec.Izin}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-extrabold text-red-500">
-                      {rec.Alpha}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold flex items-center text-zinc-300">
-              <Award className="w-5 h-5 mr-2 text-orange-500" /> 2. Rekap Nilai
-              Akhir
-            </h2>
-            {currentGradeSettings && (
-              <span className="text-xs text-zinc-500 bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700">
-                Bobot: Tugas {currentGradeSettings.tugasPercentage}% | UTS{" "}
-                {currentGradeSettings.utsPercentage}% | UAS{" "}
-                {currentGradeSettings.uasPercentage}%
-              </span>
-            )}
-          </div>
-
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 shadow-lg overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-800">
-              <thead className="bg-zinc-950/50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-zinc-400 uppercase sticky left-0 bg-zinc-950 z-10">
-                    Siswa
-                  </th>
-                  {subjects.map((s) => (
-                    <th
-                      key={s.id}
-                      className="px-6 py-4 text-center text-xs font-medium text-zinc-400 uppercase"
-                    >
-                      {s.code}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {finalRecapList.map((rec) => (
-                  <tr
-                    key={rec.uid}
-                    className="hover:bg-zinc-800/30 transition-colors"
-                  >
-                    <td className="px-6 py-4 text-sm font-medium text-zinc-200 sticky left-0 bg-zinc-900 z-10 border-r border-zinc-800">
-                      {rec.name} <br />{" "}
-                      <span className="text-xs text-zinc-500">
-                        {rec.className}
-                      </span>
-                    </td>
-                    {subjects.map((s) => {
-                      const grade = rec.grades[s.id];
-                      return (
-                        <td
-                          key={s.id}
-                          className="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold text-zinc-300"
-                        >
-                          {grade ? (
-                            <span
-                              className={
-                                grade.finalGrade < 75
-                                  ? "text-red-400"
-                                  : "text-green-400"
-                              }
-                            >
-                              {grade.finalGrade}
-                            </span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <RecapContent
+        activeYear={activeYear}
+        academicYearRecap={academicYearRecap}
+        subjects={subjects}
+        currentGradeSettings={currentGradeSettings}
+      />
     );
   } catch (error) {
     console.error(error);
