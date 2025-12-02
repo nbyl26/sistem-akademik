@@ -29,7 +29,6 @@ export default function LoginPage() {
       const { message } = await res.json();
 
       if (res.ok) {
-        await signOut(auth);
         router.push("/dashboard");
       } else {
         setError(message);
