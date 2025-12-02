@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { Users, Book, Calendar, FileText, PencilLine } from "lucide-react";
+import {
+  Users,
+  Book,
+  Calendar,
+  FileText,
+  PencilLine,
+  Megaphone,
+} from "lucide-react";
 
 export default function AdminDashboard() {
   const cards = [
@@ -7,7 +14,12 @@ export default function AdminDashboard() {
     { label: "Master Data", href: "/admin/master/academic-years", icon: Book },
     { label: "Jadwal Pelajaran", href: "/admin/schedule", icon: Calendar },
     { label: "Rekapitulasi", href: "/admin/recap", icon: FileText },
-    { label: "Manajemen Nilai", href: "/admin/master/grading-settings", icon: PencilLine },
+    {
+      label: "Manajemen Nilai",
+      href: "/admin/master/grading-settings",
+      icon: PencilLine,
+    },
+    { label: "Pengumuman", href: "/admin/announcements", icon: Megaphone },
   ];
 
   return (
@@ -21,7 +33,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map((card) => (
           <Link key={card.label} href={card.href} className="block group">
             <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 shadow-lg shadow-black/50">
