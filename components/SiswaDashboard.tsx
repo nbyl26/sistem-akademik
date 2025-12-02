@@ -18,10 +18,10 @@ export default function SiswaDashboard({ user }: { user: Siswa }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link href="/student/schedule" className="group block">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
-            <div className="bg-blue-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-blue-500 mb-4">
+            <div className="bg-orange-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 mb-4">
               <Calendar size={28} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-blue-400">
+            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-orange-400">
               Jadwal
             </h3>
             <p className="text-sm text-zinc-500 mt-2">Cek mata pelajaran</p>
@@ -30,10 +30,10 @@ export default function SiswaDashboard({ user }: { user: Siswa }) {
 
         <Link href="/student/attendance" className="group block">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
-            <div className="bg-green-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-green-500 mb-4">
+            <div className="bg-orange-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 mb-4">
               <ClipboardCheck size={28} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-green-400">
+            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-orange-400">
               Absensi
             </h3>
             <p className="text-sm text-zinc-500 mt-2">Riwayat kehadiran</p>
@@ -42,10 +42,10 @@ export default function SiswaDashboard({ user }: { user: Siswa }) {
 
         <Link href="/student/grades" className="group block">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
-            <div className="bg-yellow-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-yellow-500 mb-4">
+            <div className="bg-orange-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 mb-4">
               <Award size={28} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-yellow-400">
+            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-orange-400">
               Nilai Rapor
             </h3>
             <p className="text-sm text-zinc-500 mt-2">Hasil belajar Anda</p>
@@ -54,10 +54,10 @@ export default function SiswaDashboard({ user }: { user: Siswa }) {
 
         <Link href="/student/profile" className="group block">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
-            <div className="bg-purple-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-purple-500 mb-4">
+            <div className="bg-orange-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 mb-4">
               <User size={28} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-purple-400">
+            <h3 className="text-lg font-bold text-zinc-100 group-hover:text-orange-400">
               Profil
             </h3>
             <p className="text-sm text-zinc-500 mt-2">Data diri siswa</p>
