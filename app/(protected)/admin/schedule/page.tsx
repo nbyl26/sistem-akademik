@@ -89,14 +89,50 @@ export default function SchedulePage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const checkScheduleConflict = (): string | null => {
+    const { room, day, startTime, endTime } = formData;
+
+    const timeToMinutes = (time: string): number => {
+      const [hours, minutes] = time.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+
+    const newStart = timeToMinutes(startTime);
+    const newEnd = timeToMinutes(endTime);
+    
+    for (const schedule of schedules) {
+      if (schedule.room ===  room && schedule.day === day) {
+        const existingStart = timeToMinutes(schedule.startTime);
+        const existingEnd = timeToMinutes(schedule.endTime);
+
+        if (newStart < existingEnd && newEnd > existingStart) {
+          const existingSubject = getName(schedule.subjectId, subjects);
+          const existingTeacher = getTeacherName(schedule.teacherId);
+          return `Jadwal bentrok! ${room} sudah memiliki ${existingSubject} dengan ${existingTeacher} pada ${schedule.startTime} - ${schedule.endTime}.`;
+        }
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeYear) return;
+
+    const conflictError = checkScheduleConflict();
+    if (conflictError) {
+      setError(conflictError);
+      setFormData(initialFormData)
+      return;
+    }
+
     try {
       await addDocument(COLLECTION_NAME, formData);
       setFormData(initialFormData);
       setFormData((prev) => ({ ...prev, academicYearId: activeYear.id }));
       setIsFormOpen(false);
+      setError(null);
       await fetchData();
     } catch (err) {
       setError("Gagal menambahkan Jadwal.");
