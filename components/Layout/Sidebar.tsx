@@ -37,6 +37,7 @@ const mobileNavConfig = {
     { name: "Kelas", href: "/admin/master/classes", icon: Book },
     { name: "Jadwal", href: "/admin/schedule", icon: Clock },
     { name: "Rekap", href: "/admin/recap", icon: ClipboardCheck },
+    { name: "Pengumuman", href: "/admin/announcements", icon: Megaphone },
   ],
 };
 
@@ -54,6 +55,7 @@ const desktopNavConfig = {
       href: "/admin/master/grading-settings",
       icon: PencilLine,
     },
+    { name: "Pengumuman", href: "/admin/announcements", icon: Megaphone },
   ],
   guru: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
