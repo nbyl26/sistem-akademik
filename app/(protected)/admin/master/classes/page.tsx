@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { addDocument, getAllDocuments, updateDocument } from "@/lib/firestore";
+import {
+  addDocument,
+  getAllDocuments,
+  updateDocument,
+  deleteDocument,
+} from "@/lib/firestore";
 import { ClassData } from "@/types/master";
 import { Guru } from "@/types/user";
-import { PlusCircle, Save, Zap, Pencil, X } from "lucide-react";
+import { PlusCircle, Save, Zap, Pencil, X, Trash2 } from "lucide-react";
 
 export default function ClassesPage() {
   const [classes, setClasses] = useState<ClassData[]>([]);
@@ -74,15 +79,53 @@ export default function ClassesPage() {
     setIsEditing(false);
     setEditId(null);
     setFormData({ name: "", level: 10, waliKelasId: null });
+    setError(null);
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Yakin ingin menghapus kelas "${name}"?`)) return;
+
+    try {
+      await deleteDocument(COLLECTION_NAME, id);
+      alert("Kelas berhasil dihapus!");
+      await fetchData();
+    } catch (err) {
+      alert("Gagal menghapus kelas.");
+      console.error(err);
+    }
+  };
+
+  const checkDuplicateName = (): string | null => {
+    const { name } = formData;
+    const nameExists = classes.some((cls) => {
+      if (isEditing && editId === cls.id) {
+        return false;
+      }
+      return cls.name.toLowerCase() === name.toLowerCase();
+    });
+
+    if (nameExists) {
+      return `Kelas "${name}" sudah ada. Gunakan nama yang berbeda.`;
+    }
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const duplicateError = checkDuplicateName();
+    if (duplicateError) {
+      setError(duplicateError);
+      return;
+    }
+
     try {
       if (isEditing && editId) {
         await updateDocument(COLLECTION_NAME, editId, formData);
+        alert("Kelas berhasil diperbarui!");
       } else {
         await addDocument(COLLECTION_NAME, formData);
+        alert("Kelas berhasil ditambahkan!");
       }
       handleClose();
       await fetchData();
@@ -98,11 +141,24 @@ export default function ClassesPage() {
   };
 
   if (isLoading) return <div className="p-4 text-zinc-400">Memuat data...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
     <div className="p-2">
       <h1 className="text-3xl font-bold mb-6 text-zinc-100">Manajemen Kelas</h1>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="text-red-400">
+            <p className="font-medium">{error}</p>
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-300"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       <button
         onClick={() => (isFormOpen ? handleClose() : setIsFormOpen(true))}
@@ -228,12 +284,20 @@ export default function ClassesPage() {
                   {getWaliKelasName(c.waliKelasId)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => handleEdit(c)}
-                    className="text-orange-400 hover:text-orange-300 transition-colors flex items-center float-right px-3 py-1 hover:bg-orange-900/20 rounded"
-                  >
-                    <Pencil className="w-3 h-3 mr-2" /> Edit
-                  </button>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => handleEdit(c)}
+                      className="text-orange-400 hover:text-orange-300 transition-colors px-3 py-1 hover:bg-orange-900/20 rounded flex items-center"
+                    >
+                      <Pencil className="w-3 h-3 mr-1" /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(c.id, c.name)}
+                      className="text-red-400 hover:text-red-300 transition-colors px-3 py-1 hover:bg-red-900/20 rounded flex items-center"
+                    >
+                      <Trash2 className="w-3 h-3 mr-1" /> Hapus
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
