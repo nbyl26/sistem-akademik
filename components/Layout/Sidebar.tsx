@@ -13,30 +13,34 @@ import {
   DollarSign,
   Megaphone,
   PencilLine,
-  FileText, 
+  FileText,
 } from "lucide-react";
 
-const navConfig = {
+const mobileNavConfig = {
   guru: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
     { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
     { name: "Nilai", href: "/teacher/grades", icon: DollarSign },
-    { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText }, // Tambahkan ini
-    { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
   ],
   siswa: [
-    { name: "Home", href: "/dashboard", icon: Home },
+    { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Jadwal", href: "/student/schedule", icon: Clock },
     { name: "Nilai", href: "/student/grades", icon: DollarSign },
     { name: "Absen", href: "/student/attendance", icon: ClipboardCheck },
     { name: "Profil", href: "/student/profile", icon: Users },
   ],
+  admin: [
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Kelas", href: "/admin/master/classes", icon: Book },
+    { name: "Jadwal", href: "/admin/schedule", icon: Clock },
+    { name: "Rekap", href: "/admin/recap", icon: ClipboardCheck },
+  ],
 };
 
 const desktopNavConfig = {
-  ...navConfig,
   admin: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Manajemen Akun", href: "/admin/users", icon: Users },
@@ -60,13 +64,21 @@ const desktopNavConfig = {
     { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
   ],
+  siswa: [
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Jadwal", href: "/student/schedule", icon: Clock },
+    { name: "Nilai", href: "/student/grades", icon: DollarSign },
+    { name: "Absen", href: "/student/attendance", icon: ClipboardCheck },
+    { name: "Pengumuman", href: "/student/announcements", icon: Megaphone },
+    { name: "Profil", href: "/student/profile", icon: Users },
+  ],
 };
 
 export default function Sidebar({ user }: { user: User }) {
   const pathname = usePathname();
-  const role = user.role as keyof typeof navConfig;
+  const role = user.role as keyof typeof mobileNavConfig;
 
-  const mobileLinks = navConfig[role] || [];
+  const mobileLinks = mobileNavConfig[role] || [];
   const desktopLinks = desktopNavConfig[role] || [];
 
   const handleLogout = () => {
@@ -134,7 +146,7 @@ export default function Sidebar({ user }: { user: User }) {
 
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 z-50 pb-safe">
         <div className="flex justify-around items-center h-16">
-          {mobileLinks.slice(0, 5).map((item) => {
+          {mobileLinks.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
@@ -155,7 +167,6 @@ export default function Sidebar({ user }: { user: User }) {
             );
           })}
 
-          {/* Logout Button Mobile (Optional, usually in profile but let's put small here or user profile page) */}
           <button
             onClick={handleLogout}
             className="flex flex-col items-center justify-center w-full h-full space-y-1 text-red-500/70"
