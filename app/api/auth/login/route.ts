@@ -4,6 +4,7 @@ import { BaseUser } from "@/types/user";
 import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { adminAuth } from "@/firebase/adminConfig";
 
 export async function POST(request: Request) {
   const { uid } = await request.json();
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Role ngawur" }, { status: 403 });
   }
 
+  adminAuth.setCustomUserClaims(uid, { role: profile.role });  
   const token = jwt.sign(profile!, process.env.JWT_KEY!, { expiresIn: "1h" });
   const res = NextResponse.json({ message: "Sucess Login" }, { status: 200 });
 
