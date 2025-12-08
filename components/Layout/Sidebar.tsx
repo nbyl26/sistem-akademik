@@ -55,6 +55,11 @@ const desktopNavConfig = {
       href: "/admin/master/grading-settings",
       icon: PencilLine,
     },
+    {
+      name: "Pengaturan Kehadiran",
+      href: "/admin/master/attendence-settings",
+      icon: Users,
+    },
     { name: "Pengumuman", href: "/admin/announcements", icon: Megaphone },
   ],
   guru: [

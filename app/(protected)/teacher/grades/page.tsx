@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { verifyCookie } from "@/lib/cookies";
 import { mapUserRole } from "@/lib/map";
 import { Guru, Siswa, User } from "@/types/user";
-import { ScheduleData, ClassData, SubjectData } from "@/types/master";
+import { ScheduleData, ClassData, SubjectData, AttendanceRecord, AttendanceSettings } from "@/types/master";
 import { getAllDocuments, getActiveAcademicYear } from "@/lib/firestore";
 import { notFound } from "next/navigation";
 import GradeInputForm from "@/components/Teacher/GradeInputForm";
@@ -31,7 +31,7 @@ export default async function TeacherGradesPage() {
       );
     }
 
-    const [schedules, classes, subjects, allStudents] = await Promise.all([
+    const [schedules, classes, subjects, allStudents, attendanceRecords, attendanceSettings] = await Promise.all([
       getAllDocuments<ScheduleData>("schedules", [
         ["teacherId", "==", teacherUser.uid],
         ["academicYearId", "==", activeYear.id!],
@@ -39,7 +39,16 @@ export default async function TeacherGradesPage() {
       getAllDocuments<ClassData>("classes"),
       getAllDocuments<SubjectData>("subjects"),
       getAllDocuments<Siswa>("users", [["role", "==", "siswa"]]),
+      getAllDocuments<AttendanceRecord>("attendance", [
+        ["teacherId", "==", teacherUser.uid],
+        ["academicYearId", "==", activeYear.id!],
+      ]),
+      getAllDocuments<AttendanceSettings>("attendance_settings", [
+        ["academicYearId", "==", activeYear.id!],
+      ]),
     ]);
+
+    const currentAttendanceSettings = attendanceSettings.length > 0 ? attendanceSettings[0] : null;
 
     return (
       <GradeInputForm
@@ -49,6 +58,8 @@ export default async function TeacherGradesPage() {
         subjects={subjects}
         allStudents={allStudents as Siswa[]}
         activeYearId={activeYear.id!}
+        attendanceRecords={attendanceRecords}
+        attendanceSettings={currentAttendanceSettings}
       />
     );
   } catch (error) {

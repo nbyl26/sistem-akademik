@@ -92,3 +92,10 @@ export interface GradeSettings {
   absencePercentage?: number;
   updatedAt: string;
 }
+
+export interface AttendanceSettings {
+  id: string;
+  academicYearId: string;
+  minAttendanceForUAS: number;
+  updatedAt: string;
+}

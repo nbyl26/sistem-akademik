@@ -7,9 +7,11 @@ import {
   ClassData,
   SubjectData,
   AssessmentType,
+  AttendanceRecord,
+  AttendanceSettings,
 } from "@/types/master";
 import { Siswa } from "@/types/user";
-import { Save, FileText } from "lucide-react";
+import { Save, FileText, AlertTriangle } from "lucide-react";
 
 interface GradeProps {
   teacherId: string;
@@ -18,6 +20,8 @@ interface GradeProps {
   subjects: SubjectData[];
   allStudents: Siswa[];
   activeYearId: string;
+  attendanceRecords: AttendanceRecord[];
+  attendanceSettings: AttendanceSettings | null;
 }
 
 type NewGradeRecord = Omit<GradeRecord, "id">;
@@ -35,6 +39,8 @@ export default function GradeInputForm({
   subjects,
   allStudents,
   activeYearId,
+  attendanceRecords,
+  attendanceSettings,
 }: GradeProps) {
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
     null
@@ -43,6 +49,7 @@ export default function GradeInputForm({
   const [gradeInput, setGradeInput] = useState<Record<string, number | null>>(
     {}
   );
+  const [studentAttendance, setStudentAttendance] = useState<Record<string, { present: number; total: number; percentage: number }>>({});
   const [loading, setLoading] = useState(false);
   const [assessmentType, setAssessmentType] =
     useState<AssessmentType>("Tugas Harian");
@@ -55,22 +62,65 @@ export default function GradeInputForm({
     (s: any) => s.id === selectedScheduleId
   );
 
+  // Calculate student attendance
+  const calculateAttendance = (studentId: string, classId: string, subjectId: string) => {
+    const relevantRecords = attendanceRecords.filter(
+      (record) =>
+        record.classId === classId &&
+        record.subjectId === subjectId
+    );
+
+    let totalMeetings = 0;
+    let presentCount = 0;
+
+    relevantRecords.forEach((record) => {
+      const studentRecord = record.records.find((r) => r.studentId === studentId);
+      if (studentRecord) {
+        totalMeetings++;
+        if (studentRecord.status === "Hadir") {
+          presentCount++;
+        }
+      }
+    });
+
+    const percentage = totalMeetings > 0 ? (presentCount / totalMeetings) * 100 : 0;
+
+    return {
+      present: presentCount,
+      total: totalMeetings,
+      percentage: Math.round(percentage * 10) / 10,
+    };
+  };
+
   useEffect(() => {
     if (selectedSchedule) {
       const studentsInClass = allStudents
         .filter((s) => s.kelasId === selectedSchedule.classId)
         .sort((a, b) => a.nama.localeCompare(b.nama));
       setCurrentClassStudents(studentsInClass);
+      
       const initialGrades = studentsInClass.reduce((acc, student) => {
         acc[student.uid] = null;
         return acc;
       }, {} as Record<string, number | null>);
       setGradeInput(initialGrades);
+
+      // Calculate attendance for each student
+      const attendanceData = studentsInClass.reduce((acc, student) => {
+        acc[student.uid] = calculateAttendance(
+          student.uid,
+          selectedSchedule.classId,
+          selectedSchedule.subjectId
+        );
+        return acc;
+      }, {} as Record<string, { present: number; total: number; percentage: number }>);
+      setStudentAttendance(attendanceData);
     } else {
       setCurrentClassStudents([]);
       setGradeInput({});
+      setStudentAttendance({});
     }
-  }, [selectedSchedule, allStudents]);
+  }, [selectedSchedule, allStudents, attendanceRecords]);
 
   const handleGradeChange = (studentId: string, value: string) => {
     const score = value === "" ? null : parseInt(value);
@@ -91,6 +141,28 @@ export default function GradeInputForm({
       setLoading(false);
       return;
     }
+
+    // Check attendance requirement for UAS
+    if (assessmentType === "UAS" && attendanceSettings) {
+      const minAttendance = attendanceSettings.minAttendanceForUAS;
+      const ineligibleStudents: string[] = [];
+
+      currentClassStudents.forEach((student) => {
+        const attendance = studentAttendance[student.uid];
+        if (attendance && attendance.percentage < minAttendance) {
+          ineligibleStudents.push(`${student.nama} (${attendance.percentage.toFixed(1)}%)`);
+        }
+      });
+
+      if (ineligibleStudents.length > 0) {
+        const message = `Peringatan! Siswa berikut tidak memenuhi syarat kehadiran minimal ${minAttendance}% untuk UAS:\n\n${ineligibleStudents.join("\n")}\n\nApakah Anda yakin ingin melanjutkan?`;
+        if (!confirm(message)) {
+          setLoading(false);
+          return;
+        }
+      }
+    }
+
     try {
       const incomplete = Object.values(gradeInput).some(
         (score) => score === null
@@ -192,6 +264,22 @@ export default function GradeInputForm({
 
         {selectedSchedule && (
           <div className="mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {assessmentType === "UAS" && attendanceSettings && (
+              <div className="mb-4 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-blue-300 mb-1">
+                    Syarat Kehadiran UAS
+                  </p>
+                  <p className="text-sm text-blue-200">
+                    Minimal kehadiran untuk UAS: <span className="font-bold text-blue-400">{attendanceSettings.minAttendanceForUAS}%</span>
+                    <br />
+                    Siswa yang tidak memenuhi syarat akan diberi peringatan saat menyimpan nilai.
+                  </p>
+                </div>
+              </div>
+            )}
+            
             <h3 className="text-lg font-semibold mb-3 text-zinc-300">
               Input Nilai Kelas{" "}
               <span className="text-orange-500">
@@ -205,39 +293,83 @@ export default function GradeInputForm({
                     <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase">
                       Nama Siswa
                     </th>
+                    {assessmentType === "UAS" && (
+                      <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">
+                        Kehadiran
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-center text-xs font-medium text-zinc-400 uppercase">
                       Nilai (0-100)
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-zinc-900 divide-y divide-zinc-800">
-                  {currentClassStudents.map((student) => (
-                    <tr
-                      key={student.uid}
-                      className="hover:bg-zinc-800/50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-200">
-                        {student.nama}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={
-                            gradeInput[student.uid] === null
-                              ? ""
-                              : gradeInput[student.uid]!
-                          }
-                          onChange={(e) =>
-                            handleGradeChange(student.uid, e.target.value)
-                          }
-                          className="w-24 p-2 bg-zinc-950 border border-zinc-700 rounded text-center text-zinc-100 focus:border-orange-500 outline-none"
-                          placeholder="0"
-                        />
-                      </td>
-                    </tr>
-                  ))}
+                  {currentClassStudents.map((student) => {
+                    const attendance = studentAttendance[student.uid];
+                    const meetsRequirement = !attendanceSettings || 
+                      !attendance || 
+                      assessmentType !== "UAS" || 
+                      attendance.percentage >= attendanceSettings.minAttendanceForUAS;
+
+                    return (
+                      <tr
+                        key={student.uid}
+                        className={`hover:bg-zinc-800/50 transition-colors ${
+                          !meetsRequirement ? "bg-red-900/10" : ""
+                        }`}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-200">
+                          {student.nama}
+                          {!meetsRequirement && (
+                            <span className="ml-2 text-xs text-red-400">
+                              (Tidak memenuhi syarat)
+                            </span>
+                          )}
+                        </td>
+                        {assessmentType === "UAS" && (
+                          <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            {attendance ? (
+                              <div className="flex flex-col items-center">
+                                <span
+                                  className={`font-bold ${
+                                    meetsRequirement
+                                      ? "text-green-400"
+                                      : "text-red-400"
+                                  }`}
+                                >
+                                  {attendance.percentage.toFixed(1)}%
+                                </span>
+                                <span className="text-xs text-zinc-500">
+                                  {attendance.present}/{attendance.total}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-zinc-500 text-xs">
+                                Belum ada data
+                              </span>
+                            )}
+                          </td>
+                        )}
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={
+                              gradeInput[student.uid] === null
+                                ? ""
+                                : gradeInput[student.uid]!
+                            }
+                            onChange={(e) =>
+                              handleGradeChange(student.uid, e.target.value)
+                            }
+                            className="w-24 p-2 bg-zinc-950 border border-zinc-700 rounded text-center text-zinc-100 focus:border-orange-500 outline-none"
+                            placeholder="0"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

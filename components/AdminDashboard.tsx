@@ -6,6 +6,7 @@ import {
   FileText,
   PencilLine,
   Megaphone,
+  ClipboardCheck,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -18,6 +19,11 @@ export default function AdminDashboard() {
       label: "Manajemen Nilai",
       href: "/admin/master/grading-settings",
       icon: PencilLine,
+    },
+    {
+      label: "Pengaturan Kehadiran",
+      href: "/admin/master/attendence-settings",
+      icon: ClipboardCheck,
     },
     { label: "Pengumuman", href: "/admin/announcements", icon: Megaphone },
   ];
