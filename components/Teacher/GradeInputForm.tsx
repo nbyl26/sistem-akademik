@@ -83,11 +83,11 @@ export default function GradeInputForm({
       }
     });
 
-    const percentage = totalMeetings > 0 ? (presentCount / totalMeetings) * 100 : 0;
+    const percentage = totalMeetings > 0 ? (presentCount / 16) * 100 : 0;
 
     return {
       present: presentCount,
-      total: totalMeetings,
+      total: 16,
       percentage: Math.round(percentage * 10) / 10,
     };
   };

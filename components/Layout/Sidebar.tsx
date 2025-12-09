@@ -19,9 +19,16 @@ import {
 const mobileNavConfig = {
   guru: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
-    { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
-    { name: "Nilai", href: "/teacher/grades", icon: DollarSign },
+    { name: "Jadwal Mengajar", href: "/teacher/schedule", icon: Clock },
+    {
+      name: "Input Absensi",
+      href: "/teacher/attendance",
+      icon: ClipboardCheck,
+    },
+    { name: "Input Nilai", href: "/teacher/grades", icon: PencilLine },
+    { name: "Rekap Nilai", href: "/teacher/grade-recap", icon: DollarSign }, // BARU
+    { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText },
+    { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
   ],
   siswa: [
@@ -64,9 +71,14 @@ const desktopNavConfig = {
   ],
   guru: [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Jadwal", href: "/teacher/schedule", icon: Clock },
-    { name: "Absensi", href: "/teacher/attendance", icon: ClipboardCheck },
-    { name: "Nilai", href: "/teacher/grades", icon: PencilLine },
+    { name: "Jadwal Mengajar", href: "/teacher/schedule", icon: Clock },
+    {
+      name: "Input Absensi",
+      href: "/teacher/attendance",
+      icon: ClipboardCheck,
+    },
+    { name: "Input Nilai", href: "/teacher/grades", icon: PencilLine },
+    { name: "Rekap Nilai", href: "/teacher/grade-recap", icon: DollarSign }, // BARU
     { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText },
     { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
