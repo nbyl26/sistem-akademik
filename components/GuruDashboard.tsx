@@ -8,6 +8,7 @@ import {
   FileText,
   Award,
   User,
+  PencilLine,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -54,7 +55,7 @@ export default function GuruDashboard() {
         <Link href="/teacher/grades" className="group block">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-800/50 transition-all duration-300 h-full shadow-lg">
             <div className="bg-orange-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-orange-500 mb-4">
-              <DollarSign size={28} />
+              <PencilLine size={28} />
             </div>
             <h3 className="text-lg font-bold text-zinc-100 group-hover:text-orange-400">
               Input Nilai

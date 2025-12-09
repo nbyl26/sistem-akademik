@@ -14,6 +14,7 @@ import {
   Megaphone,
   PencilLine,
   FileText,
+  Award,
 } from "lucide-react";
 
 const mobileNavConfig = {
@@ -78,7 +79,7 @@ const desktopNavConfig = {
       icon: ClipboardCheck,
     },
     { name: "Input Nilai", href: "/teacher/grades", icon: PencilLine },
-    { name: "Rekap Nilai", href: "/teacher/grade-recap", icon: DollarSign }, // BARU
+    { name: "Rekap Nilai", href: "/teacher/grade-recap", icon: Award }, // BARU
     { name: "Rekap Absensi", href: "/teacher/recap", icon: FileText },
     { name: "Pengumuman", href: "/teacher/announcements", icon: Megaphone },
     { name: "Profil", href: "/teacher/profile", icon: Users },
